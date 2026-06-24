@@ -118,7 +118,154 @@ describe('GameEngine Interface', () => {
 
       expect(gameState.display_word).toBe('C A S A');
       expect(gameState.status).toBe('WON');
-      expect(gameState.message).toBe('Parabéns! Você ganhou.');
+      expect(gameState.message).toContain('Parabéns! Você ganhou.');
+    });
+  });
+
+  describe('Score', () => {
+    it('should initialize score at 0', () => {
+      const initialState = gameEngine.startGame();
+      expect(initialState.score).toBe(0);
+    });
+
+    it('should score remaining time x remaining lives when the player wins', () => {
+      let gameState = gameEngine.startGame();
+
+      // Gasta 10 segundos antes de adivinhar (timer = 50, vidas = 6)
+      for (let i = 0; i < 10; i++) {
+        gameState = gameEngine.handleEvent('tick', undefined, gameState);
+      }
+
+      gameState = gameEngine.guessLetter(gameState, 'C');
+      gameState = gameEngine.guessLetter(gameState, 'A');
+      gameState = gameEngine.guessLetter(gameState, 'S');
+
+      expect(gameState.status).toBe('WON');
+      expect(gameState.score).toBe(300); // 50 restante x 6 vidas
+    });
+
+    it('should factor in lost lives in the score', () => {
+      let gameState = gameEngine.startGame();
+
+      // Erra 2 vezes (vidas = 4), sem gastar tempo (timer = 60)
+      gameState = gameEngine.guessLetter(gameState, 'Z');
+      gameState = gameEngine.guessLetter(gameState, 'X');
+
+      gameState = gameEngine.guessLetter(gameState, 'C');
+      gameState = gameEngine.guessLetter(gameState, 'A');
+      gameState = gameEngine.guessLetter(gameState, 'S');
+
+      expect(gameState.status).toBe('WON');
+      expect(gameState.score).toBe(240); // 60 restante x 4 vidas
+    });
+
+    it('should give the maximum score when winning instantly', () => {
+      let gameState = gameEngine.startGame();
+      gameState = gameEngine.guessLetter(gameState, 'C');
+      gameState = gameEngine.guessLetter(gameState, 'A');
+      gameState = gameEngine.guessLetter(gameState, 'S');
+
+      expect(gameState.status).toBe('WON');
+      expect(gameState.score).toBe(360); // 60 x 6
+    });
+
+    it('should include the score in the winning message', () => {
+      let gameState = gameEngine.startGame();
+      gameState = gameEngine.guessLetter(gameState, 'C');
+      gameState = gameEngine.guessLetter(gameState, 'A');
+      gameState = gameEngine.guessLetter(gameState, 'S');
+
+      expect(gameState.message).toContain('Pontuação: 360');
+    });
+
+    it('should score 0 when the player loses by running out of lives', () => {
+      let gameState = gameEngine.startGame();
+      for (let i = 0; i < 6; i++) {
+        gameState = gameEngine.guessLetter(gameState, String.fromCharCode(90 - i));
+      }
+
+      expect(gameState.status).toBe('LOST');
+      expect(gameState.score).toBe(0);
+    });
+
+    it('should score 0 when the timer runs out', () => {
+      let gameState = gameEngine.startGame();
+      for (let i = 0; i < 60; i++) {
+        gameState = gameEngine.handleEvent('tick', undefined, gameState);
+      }
+
+      expect(gameState.status).toBe('LOST');
+      expect(gameState.score).toBe(0);
+    });
+  });
+
+  describe('Score storage (in-memory)', () => {
+    beforeEach(() => {
+      gameEngine.clearScores();
+    });
+
+    it('should start with no stored scores', () => {
+      expect(gameEngine.getScores()).toEqual([]);
+    });
+
+    it('should store a score in memory', () => {
+      gameEngine.saveScore(42);
+      expect(gameEngine.getScores()).toEqual([42]);
+    });
+
+    it('should keep the scores in insertion order', () => {
+      gameEngine.saveScore(10);
+      gameEngine.saveScore(30);
+      gameEngine.saveScore(20);
+      expect(gameEngine.getScores()).toEqual([10, 30, 20]);
+    });
+
+    it('should clear stored scores', () => {
+      gameEngine.saveScore(5);
+      gameEngine.clearScores();
+      expect(gameEngine.getScores()).toEqual([]);
+    });
+
+    it('should return a copy, not the internal array', () => {
+      gameEngine.saveScore(7);
+      const scores = gameEngine.getScores();
+      scores.push(999);
+      expect(gameEngine.getScores()).toEqual([7]);
+    });
+  });
+
+  describe('Accumulated score', () => {
+    beforeEach(() => {
+      gameEngine.clearScores();
+    });
+
+    it('should be 0 when there are no scores', () => {
+      expect(gameEngine.getTotalScore()).toBe(0);
+    });
+
+    it('should sum every stored score', () => {
+      gameEngine.saveScore(360);
+      gameEngine.saveScore(240);
+      gameEngine.saveScore(100);
+      expect(gameEngine.getTotalScore()).toBe(700);
+    });
+
+    it('should accumulate across games played end to end', () => {
+      // Partida 1: vitória instantânea = 360
+      let game = gameEngine.startGame();
+      game = gameEngine.guessLetter(game, 'C');
+      game = gameEngine.guessLetter(game, 'A');
+      game = gameEngine.guessLetter(game, 'S');
+      gameEngine.saveScore(game.score);
+
+      // Partida 2: derrota = 0
+      game = gameEngine.startGame();
+      for (let i = 0; i < 6; i++) {
+        game = gameEngine.guessLetter(game, String.fromCharCode(90 - i));
+      }
+      gameEngine.saveScore(game.score);
+
+      expect(gameEngine.getTotalScore()).toBe(360);
     });
   });
 

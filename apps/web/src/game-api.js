@@ -20,3 +20,15 @@ export function handleEvent(event, data, gameState) {
 export function version() {
   return engine.version();
 }
+
+export function saveScore(score) {
+  return engine.saveScore(score);
+}
+
+export function getScores() {
+  return engine.getScores();
+}
+
+export function getTotalScore() {
+  return engine.getTotalScore();
+}

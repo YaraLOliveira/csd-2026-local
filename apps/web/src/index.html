@@ -19,16 +19,25 @@
             Engine Version: <span id="version">Loading...</span>
         </div>
 
-        <div class="game-info">
-            <div class="lives">
-                Attempts Remaining: <span id="lives">6</span>
+        <div class="stats-bar">
+            <div class="stat">
+                <span class="stat-label">Vidas</span>
+                <span class="stat-value" id="lives">6</span>
+            </div>
+            <div class="stat" id="timer-display" style="display: none;">
+                <span class="stat-label">Tempo</span>
+                <span class="stat-value" id="timer-value">0</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Pontos</span>
+                <span class="stat-value" id="score-value">0</span>
+            </div>
+            <div class="stat accent" title="Soma de todas as partidas desta sessão">
+                <span class="stat-label">Acumulada</span>
+                <span class="stat-value" id="accumulated-score-value">0</span>
             </div>
         </div>
-
-        <div class="timer-display" id="timer-display" style="display: none;">
-            <div class="timer-label">Timer</div>
-            <div class="timer-value" id="timer-value">0</div>
-        </div>
+        <p class="score-hint">Pontos = tempo restante × vidas restantes</p>
 
         <div class="word-display" id="word-display">_ _ _ _ _ _ _ _ _ _ _</div>
 

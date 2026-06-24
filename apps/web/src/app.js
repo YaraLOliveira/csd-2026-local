@@ -26,6 +26,8 @@ const leaderboardSection = document.getElementById('leaderboard-section');
 const leaderboardList = document.getElementById('leaderboard-list');
 const timerDisplay = document.getElementById('timer-display');
 const timerValue = document.getElementById('timer-value');
+const scoreValue = document.getElementById('score-value');
+const accumulatedScoreValue = document.getElementById('accumulated-score-value');
 const versionDisplay = document.getElementById('version');
 const reloadNotification = document.getElementById('reload-notification');
 const moneyBag = document.getElementById('money-bag');
@@ -130,6 +132,7 @@ function startTimer() {
                     if (currentGameState.status !== 'RUNNING') {
                         stopTimer();
                         disableInput();
+                        handleGameEnd();
                     }
                 }
             } catch (error) {
@@ -159,7 +162,7 @@ function updateTimer() {
 // Update timer display visibility and value
 function updateTimerDisplay() {
     if (featureFlags.timer) {
-        timerDisplay.style.display = 'block';
+        timerDisplay.style.display = 'flex';
         if (currentGameState && currentGameState.timer !== undefined) {
             timerValue.textContent = currentGameState.timer;
         } else {
@@ -167,6 +170,22 @@ function updateTimerDisplay() {
         }
     } else {
         timerDisplay.style.display = 'none';
+    }
+}
+
+// Update score panel (current game score + accumulated total from the engine)
+function updateScoreDisplay() {
+    if (scoreValue) {
+        scoreValue.textContent = currentGameState && currentGameState.score !== undefined
+            ? currentGameState.score
+            : 0;
+    }
+    if (accumulatedScoreValue) {
+        try {
+            accumulatedScoreValue.textContent = gameApi.getTotalScore();
+        } catch (error) {
+            console.error('Error reading accumulated score:', error);
+        }
     }
 }
 
@@ -381,6 +400,16 @@ async function makeGuessWithLetter(letter) {
 
 // Handle game end (save score if leaderboard enabled)
 async function handleGameEnd() {
+    // Armazena o score da partida na memória da engine (independente do leaderboard).
+    if (currentGameState && currentGameState.score !== undefined) {
+        try {
+            gameApi.saveScore(currentGameState.score);
+            updateScoreDisplay();
+        } catch (error) {
+            console.error('Error storing score:', error);
+        }
+    }
+
     if (!featureFlags.leaderboard) return;
 
     const playerName = playerNameInput.value.trim();
@@ -425,6 +454,9 @@ function updateUI() {
 
     // Update money bag display
     updateMoneyBagDisplay();
+
+    // Update score panel
+    updateScoreDisplay();
 
     // Update virtual keyboard button states based on guessed letters
     if (featureFlags.virtualKeyboard) {

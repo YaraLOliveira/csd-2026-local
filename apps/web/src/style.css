@@ -60,30 +60,61 @@ h1 {
     border-radius: 10px;
 }
 
-.timer-display {
-    text-align: center;
-    margin: 20px auto;
-    padding: 20px;
+.stats-bar {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 8px 0;
+}
+
+.stat {
+    flex: 1 1 0;
+    min-width: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 8px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid #eef0f3;
+}
+
+.stat.accent {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 15px;
-    max-width: 200px;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    border: none;
 }
 
-.timer-label {
-    color: white;
-    font-size: 0.9rem;
-    font-weight: bold;
+.stat-label {
+    font-size: 0.7rem;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 10px;
+    letter-spacing: 1px;
+    color: #888;
 }
 
-.timer-value {
-    color: white;
-    font-size: 3rem;
+.stat.accent .stat-label {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.stat-value {
+    font-size: 1.6rem;
     font-weight: bold;
+    color: #333;
     font-family: 'Courier New', monospace;
+    line-height: 1;
+}
+
+.stat.accent .stat-value {
+    color: white;
+}
+
+.score-hint {
+    text-align: center;
+    color: #999;
+    font-size: 0.75rem;
+    margin: 0 0 8px;
 }
 
 .word-display {

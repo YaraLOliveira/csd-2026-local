@@ -127,3 +127,33 @@ Then('o status do jogo deve ser {string}', function (status) {
 Then('eu devo ver uma mensagem de tempo esgotado', function () {
   assert.match(currentGameState.message, /[Tt]empo esgotado/);
 });
+
+// --- Pontuação ---
+
+Then('a pontuação deve ser {int}', function (expectedScore) {
+  assert.strictEqual(currentGameState.score, expectedScore);
+});
+
+Given('que o histórico de scores está vazio', function () {
+  gameEngine.clearScores();
+  assert.deepStrictEqual(gameEngine.getScores(), []);
+});
+
+When('o score da partida é armazenado', function () {
+  gameEngine.saveScore(currentGameState.score);
+});
+
+Then('o histórico de scores deve conter {int}', function (expectedScore) {
+  assert.ok(
+    gameEngine.getScores().includes(expectedScore),
+    `Esperava que o histórico ${JSON.stringify(gameEngine.getScores())} contivesse ${expectedScore}`,
+  );
+});
+
+Given('que uma partida valendo {int} pontos foi armazenada', function (score) {
+  gameEngine.saveScore(score);
+});
+
+Then('a pontuação acumulada deve ser {int}', function (expectedTotal) {
+  assert.strictEqual(gameEngine.getTotalScore(), expectedTotal);
+});
