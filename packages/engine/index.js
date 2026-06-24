@@ -9,6 +9,7 @@ class GameEngine {
       status: 'RUNNING',
       word: word,
       lives: 6,
+      timer: 60,
       display_word: this._getInitialDisplayWord(word),
       guesses: [],
       message: 'Adivinhe uma letra',
@@ -57,6 +58,27 @@ class GameEngine {
   }
 
   handleEvent(event, data, currentGameState) {
+    if (event === 'tick' && currentGameState.status === 'RUNNING') {
+      let newTimer = currentGameState.timer - 1;
+      
+      if (newTimer < 0) {
+        newTimer = 0;
+      }
+
+      const newGameState = {
+        ...currentGameState,
+        timer: newTimer,
+      };
+
+      // Game over if timer reaches 0
+      if (newTimer === 0) {
+        newGameState.status = 'LOST';
+        newGameState.message = 'Tempo esgotado! Você perdeu.';
+      }
+
+      return newGameState;
+    }
+
     return currentGameState;
   }
 

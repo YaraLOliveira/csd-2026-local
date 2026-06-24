@@ -101,3 +101,29 @@ Then('apenas a primeira letra {string} deve ser processada', function (letter) {
     `Esperava apenas 1 instância da letra "${normalizedLetter}", mas encontrei ${countLetter}`,
   );
 });
+
+// --- Timer ---
+
+When('ocorre {int} tick', function (ticks) {
+  for (let i = 0; i < ticks; i++) {
+    currentGameState = gameEngine.handleEvent('tick', undefined, currentGameState);
+  }
+});
+
+When('ocorrem {int} ticks', function (ticks) {
+  for (let i = 0; i < ticks; i++) {
+    currentGameState = gameEngine.handleEvent('tick', undefined, currentGameState);
+  }
+});
+
+Then('o timer deve ser {int}', function (expectedTimer) {
+  assert.strictEqual(currentGameState.timer, expectedTimer);
+});
+
+Then('o status do jogo deve ser {string}', function (status) {
+  assert.strictEqual(currentGameState.status, status);
+});
+
+Then('eu devo ver uma mensagem de tempo esgotado', function () {
+  assert.match(currentGameState.message, /[Tt]empo esgotado/);
+});

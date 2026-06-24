@@ -122,6 +122,68 @@ describe('GameEngine Interface', () => {
     });
   });
 
+  describe('Timer', () => {
+    it('should initialize with a default timer value', () => {
+      const initialState = gameEngine.startGame();
+
+      expect(initialState).toHaveProperty('timer');
+      expect(initialState.timer).toBe(60);
+    });
+
+    it('should decrement timer by 1 on tick event', () => {
+      const initialState = gameEngine.startGame();
+
+      const stateAfterTick = gameEngine.handleEvent('tick', undefined, initialState);
+
+      expect(stateAfterTick.timer).toBe(59);
+    });
+
+    it('should not go below 0', () => {
+      const initialState = gameEngine.startGame();
+      let state = initialState;
+
+      // Tick 60 times to reach 0
+      for (let i = 0; i < 60; i++) {
+        state = gameEngine.handleEvent('tick', undefined, state);
+      }
+
+      expect(state.timer).toBe(0);
+
+      // Try to tick again
+      const stateBelowZero = gameEngine.handleEvent('tick', undefined, state);
+      expect(stateBelowZero.timer).toBe(0);
+    });
+
+    it('should set status to LOST when timer reaches 0', () => {
+      const initialState = gameEngine.startGame();
+      let state = initialState;
+
+      // Tick 60 times to reach 0
+      for (let i = 0; i < 60; i++) {
+        state = gameEngine.handleEvent('tick', undefined, state);
+      }
+
+      expect(state.status).toBe('LOST');
+      expect(state.message).toContain('Tempo esgotado');
+    });
+
+    it('should not process tick event if game status is not RUNNING', () => {
+      const initialState = gameEngine.startGame();
+      let gameState = initialState;
+
+      // Finish the game by winning
+      gameState = gameEngine.guessLetter(gameState, 'C');
+      gameState = gameEngine.guessLetter(gameState, 'A');
+      gameState = gameEngine.guessLetter(gameState, 'S');
+
+      expect(gameState.status).toBe('WON');
+
+      // Timer should not change after game ends
+      const stateAfterTick = gameEngine.handleEvent('tick', undefined, gameState);
+      expect(stateAfterTick.timer).toBe(gameState.timer);
+    });
+  });
+
   describe('version()', () => {
     it('should return a version string', () => {
       const version = gameEngine.version();
