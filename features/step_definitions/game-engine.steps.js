@@ -20,7 +20,9 @@ Given("que o jogo foi iniciado", function () {
 });
 
 When("eu palpito a letra {string}", function (letra) {
-  currentGameState = gameEngine.guessLetter(currentGameState, letra);
+  // Pegar apenas a primeira letra se múltiplas forem fornecidas
+  const singleLetter = letra.charAt(0);
+  currentGameState = gameEngine.guessLetter(currentGameState, singleLetter);
 });
 
 Then('meu número de vidas deve permanecer o mesmo', function () {
@@ -37,9 +39,10 @@ Then("meu número de vidas deve diminuir em {int}", function (livesDecrease) {
 Then(
   "a letra {string} deve ser adicionada aos meus palpites",
   function (letter) {
+    const normalizedLetter = letter.toUpperCase();
     assert.ok(
-      currentGameState.guesses.includes(letter),
-      `Esperava que a letra "${letter}" estivesse em ${JSON.stringify(currentGameState.guesses)}`,
+      currentGameState.guesses.includes(normalizedLetter),
+      `Esperava que a letra "${normalizedLetter}" estivesse em ${JSON.stringify(currentGameState.guesses)}`,
     );
   },
 );
@@ -62,11 +65,39 @@ Then(
 
 Then('as letras {string} devem ser adicionadas aos meus palpites', function (letras) {
   // "letras" é uma lista separada por vírgula, ex.: "a, b, c"
-  const letrasEsperadas = letras.split(",").map((l) => l.trim());
+  const letrasEsperadas = letras.split(",").map((l) => l.trim().toUpperCase());
   letrasEsperadas.forEach((letra) => {
     assert.ok(
       currentGameState.guesses.includes(letra),
       `Esperava que a letra "${letra}" estivesse em ${JSON.stringify(currentGameState.guesses)}`,
     );
   });
+});
+
+Then('apenas a letra {string} deve ser adicionada aos meus palpites', function (letter) {
+  const normalizedLetter = letter.toUpperCase();
+  assert.strictEqual(
+    currentGameState.guesses.length,
+    1,
+    `Esperava apenas 1 letra nos palpites, mas encontrei ${currentGameState.guesses.length}`,
+  );
+  assert.ok(
+    currentGameState.guesses.includes(normalizedLetter),
+    `Esperava que a letra "${normalizedLetter}" estivesse em ${JSON.stringify(currentGameState.guesses)}`,
+  );
+});
+
+Then('apenas a primeira letra {string} deve ser processada', function (letter) {
+  const normalizedLetter = letter.toUpperCase();
+  assert.ok(
+    currentGameState.guesses.includes(normalizedLetter),
+    `Esperava que a letra "${normalizedLetter}" estivesse em ${JSON.stringify(currentGameState.guesses)}`,
+  );
+  // Verificar que não há múltiplas instâncias da mesma letra
+  const countLetter = currentGameState.guesses.filter(g => g === normalizedLetter).length;
+  assert.strictEqual(
+    countLetter,
+    1,
+    `Esperava apenas 1 instância da letra "${normalizedLetter}", mas encontrei ${countLetter}`,
+  );
 });

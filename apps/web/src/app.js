@@ -338,14 +338,18 @@ async function makeGuess() {
     // Validate that only a single letter was entered
     if (letter.length !== 1) {
         messageDisplay.textContent = 'Please enter only one letter';
+        messageDisplay.className = 'message error';
         letterInput.value = '';
+        letterInput.focus();
         return;
     }
 
     // Validate that the input is alphabetic
     if (!/^[a-z]$/i.test(letter)) {
         messageDisplay.textContent = 'Please enter a valid letter (A-Z)';
+        messageDisplay.className = 'message error';
         letterInput.value = '';
+        letterInput.focus();
         return;
     }
 
@@ -485,6 +489,20 @@ guessButton.addEventListener('click', makeGuess);
 letterInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         makeGuess();
+    }
+});
+
+// Real-time validation for single letter input
+letterInput.addEventListener('input', (e) => {
+    if (e.target.value.length > 1) {
+        messageDisplay.textContent = 'Please enter only one letter';
+        messageDisplay.className = 'message error';
+    } else if (e.target.value.length === 1 && !/^[a-z]$/i.test(e.target.value)) {
+        messageDisplay.textContent = 'Please enter a valid letter (A-Z)';
+        messageDisplay.className = 'message error';
+    } else if (e.target.value.length === 0) {
+        messageDisplay.textContent = currentGameState ? currentGameState.message : 'Click "New Game" to start';
+        messageDisplay.className = 'message';
     }
 });
 
