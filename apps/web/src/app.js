@@ -335,6 +335,20 @@ async function makeGuess() {
         return;
     }
 
+    // Validate that only a single letter was entered
+    if (letter.length !== 1) {
+        messageDisplay.textContent = 'Please enter only one letter';
+        letterInput.value = '';
+        return;
+    }
+
+    // Validate that the input is alphabetic
+    if (!/^[a-z]$/i.test(letter)) {
+        messageDisplay.textContent = 'Please enter a valid letter (A-Z)';
+        letterInput.value = '';
+        return;
+    }
+
     await makeGuessWithLetter(letter);
     letterInput.value = '';
     letterInput.focus();
