@@ -16,11 +16,21 @@ class GameEngine {
   }
 
   guessLetter(currentGameState, letter) {
-    const guesses = [...currentGameState.guesses, letter];
-    const isCorrect = currentGameState.word.includes(letter);
-    const lives = isCorrect
-      ? currentGameState.lives
-      : currentGameState.lives - 1;
+    const normalizedLetter = letter.toUpperCase();
+    const normalizedWord = currentGameState.word.toUpperCase();
+
+    if (currentGameState.guesses.includes(normalizedLetter)) {
+      return {
+        ...currentGameState,
+        message: `Você já chutou a letra ${normalizedLetter}.`,
+      };
+    }
+
+    const guesses = [...currentGameState.guesses, normalizedLetter];
+    const isCorrect = normalizedWord.includes(normalizedLetter);
+    let lives = isCorrect ? currentGameState.lives : currentGameState.lives - 1;
+
+    if (lives < 0) lives = 0;
 
     const newGameState = {
       ...currentGameState,
@@ -32,6 +42,16 @@ class GameEngine {
     };
 
     newGameState.display_word = this._getDisplayWord(newGameState);
+
+    if (newGameState.lives === 0 && newGameState.display_word.includes('_')) {
+      newGameState.status = 'LOST';
+      newGameState.message = 'Você perdeu. Tente novamente.';
+    }
+
+    if (!newGameState.display_word.includes('_')) {
+      newGameState.status = 'WON';
+      newGameState.message = 'Parabéns! Você ganhou.';
+    }
 
     return newGameState;
   }

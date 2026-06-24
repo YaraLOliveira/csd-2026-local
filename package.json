@@ -16,7 +16,7 @@
     "test": "jest",
     "tdd:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:bdd": "mkdir -p reports && cucumber-js",
+    "test:bdd": "npx mkdirp reports && cucumber-js",
     "test:all": "npm run test && npm run test:bdd"
   },
   "keywords": ["forca", "hangman", "game", "education", "agile", "csd"],
