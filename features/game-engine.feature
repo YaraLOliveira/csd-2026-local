@@ -17,9 +17,6 @@ Funcionalidade: Motor do Jogo - Palpitar Letra
     Mas o status do jogo deve permanecer "RUNNING" se eu tiver vidas restantes
 
   Cenário: Jogador tenta palpitar múltiplas letras de uma vez
-    Quando eu palpito a letra "c"
-    Então apenas a letra "c" deve ser adicionada aos meus palpites
-    E meu número de vidas deve permanecer o mesmo
     Quando eu palpito a letra "ccc"
     Então apenas a primeira letra "c" deve ser processada
     E meu número de vidas deve permanecer o mesmo

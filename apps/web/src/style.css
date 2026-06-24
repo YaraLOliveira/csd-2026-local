@@ -274,6 +274,11 @@ button:disabled {
     font-weight: bold;
 }
 
+.message.error {
+    color: #dc3545;
+    font-weight: bold;
+}
+
 .input-section.disabled {
     opacity: 0.5;
     pointer-events: none;
